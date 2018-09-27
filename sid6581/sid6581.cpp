@@ -43,25 +43,8 @@ Sid6581::Sid6581()
     }
 }
 
-void Sid6581::poke(uint8_t addr, uint8_t data)
+void Sid6581::poke(uint8_t addr, uint8_t data) const
 {
-    //TODO: shift registers
-    //SICK THATS NOW
-    /*
-    for (int i = 0; i < 16; i++) { // 16 bits
-        // write the data
-        digitalWrite(sr_data_out, word & 0x8000);
-        
-        // clock the sr
-        digitalWrite(store_clk, HIGH);
-        digitalWrite(store_clk, LOW);
-        digitalWrite(shift_clk, HIGH);
-        digitalWrite(shift_clk, LOW);
-
-        // shift the word
-        word >>= 1;
-    }
-    */
     digitalWrite(store_clk, LOW);
     shiftOut(sr_data_out, shift_clk, MSBFIRST, addr);
     shiftOut(sr_data_out, shift_clk, MSBFIRST, data);
@@ -71,20 +54,20 @@ void Sid6581::poke(uint8_t addr, uint8_t data)
     cycle_cs();
 }
 
-void Sid6581::cycle_cs()
+void Sid6581::cycle_cs() const
 {
     digitalWrite(cs_pin, LOW);
     delayMicroseconds(200);
     digitalWrite(cs_pin, HIGH);
 }
 
-void Sid6581::set_master_volume(uint8_t vol)
+void Sid6581::set_master_volume(uint8_t vol) const
 {
     uint16_t val = vol & 0x0f;
     poke(0x18, val);
 }
 
-void Sid6581::reset()
+void Sid6581::reset() const
 {
     digitalWrite(reset_pin, LOW);
     delay(1000);

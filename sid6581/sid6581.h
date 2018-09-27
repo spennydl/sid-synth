@@ -6,10 +6,10 @@ class Sid6581 {
 public:
     Sid6581();
 
-    void poke(uint8_t addr, uint8_t data);
-    void cycle_cs();
-    void set_master_volume(uint8_t vol);
-    void reset();
+    void poke(uint8_t addr, uint8_t data) const;
+    void cycle_cs() const;
+    void set_master_volume(uint8_t vol) const;
+    void reset() const;
 
 private:
     const int rw_pin = 7;
