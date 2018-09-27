@@ -1,0 +1,13 @@
+taking Some('v')
+identifer
+taking Some('i')
+taking Some('o')
+taking Some('l')
+taking Some('a')
+taking Some(':')
+chunk: viola
+colon
+taking Some('\n')
+setting ctx to Score
+newline
+taking Some(' ')
