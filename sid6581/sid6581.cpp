@@ -50,6 +50,7 @@ void Sid6581::poke(uint8_t addr, uint8_t data) const
     shiftOut(sr_data_out, shift_clk, MSBFIRST, data);
     digitalWrite(store_clk, HIGH);
 
+    delayMicroseconds(200);
     // data should be on the bus, send to chip
     cycle_cs();
 }

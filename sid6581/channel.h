@@ -32,10 +32,11 @@ struct Voice {
 class Channel {
     public:
 
-        Channel(Sid6581 *sid_, VoiceRegisters *registers_, VoiceProfile (&voices_)[3])
+        Channel(Sid6581 *sid_, VoiceRegisters *registers_, VoiceProfile (&voices_)[16])
             : sid(sid_),
             registers(registers_),
             voices(voices_),
+            voice_idx(0),
             current_voice(&voices_[0]) 
         {
             reset_voice();
@@ -48,7 +49,8 @@ class Channel {
     private:
         // this array will be in static storage and there
         // will only ever be one per channel
-        VoiceProfile (&voices)[3];
+        VoiceProfile (&voices)[16];
+        uint8_t voice_idx;
         VoiceProfile *current_voice;
 
         VoiceRegisters *registers;

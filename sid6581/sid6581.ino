@@ -31,11 +31,11 @@ VoiceRegisters voice_two_reg = {
 };
 
 VoiceRegisters voice_three_reg = {
-    .ctrl    = 0x0E,
-    .note_lo = 0x0F,
-    .note_hi = 0x10,
-    .pw_lo   = 0x11,
-    .pw_hi   = 0x12,
+    .ctrl    = 0x12,
+    .note_lo = 0x0E,
+    .note_hi = 0x0F,
+    .pw_lo   = 0x10,
+    .pw_hi   = 0x11,
     .ad      = 0x13,
     .sr      = 0x14
 };
@@ -43,66 +43,137 @@ VoiceRegisters voice_three_reg = {
 //----------------------------------------------------------------------------
 // voice profile config
 //----------------------------------------------------------------------------
-VoiceProfile channel_one_voices[3] = {
-{ // kick drum
-    .ctrl  = 0x80,
-    .pw_lo = 0x00,
+VoiceProfile channel_one_voices[16] = {
+    // squares
+{
+    .ctrl  = 0x40,
+    .pw_lo = 0x60,
     .pw_hi = 0x00,
     .ad    = 0x38,
-    .sr    = 0x84
+    .sr    = 0xA9
 },
 
-{ // snare drum
-    .ctrl  = 0x80,
-    .pw_lo = 0x00,
+{
+    .ctrl  = 0x40,
+    .pw_lo = 0x80,
     .pw_hi = 0x00,
     .ad    = 0x38,
-    .sr    = 0x84
+    .sr    = 0xC6
 },
 
-{ // hi hat
-    .ctrl  = 0x80,
-    .pw_lo = 0x00,
+{
+    .ctrl  = 0x40,
+    .pw_lo = 0x10,
     .pw_hi = 0x00,
     .ad    = 0x38,
-    .sr    = 0x84
-}
-};
-
-VoiceProfile channel_two_voices[3] = {
-{ // bass
-    .ctrl  = 0x80,
-    .pw_lo = 0x00,
-    .pw_hi = 0x00,
-    .ad    = 0x38,
-    .sr    = 0x84
+    .sr    = 0xFA
 },
 
-{ // bass 2
-    .ctrl  = 0x80,
+{
+    .ctrl  = 0x40,
     .pw_lo = 0x00,
-    .pw_hi = 0x00,
+    .pw_hi = 0x04,
     .ad    = 0x38,
-    .sr    = 0x84
-},
-};
-
-VoiceProfile channel_three_voices[3] = {
-{ // lead
-    .ctrl  = 0x80,
-    .pw_lo = 0x00,
-    .pw_hi = 0x00,
-    .ad    = 0x38,
-    .sr    = 0x84
+    .sr    = 0xFA
 },
 
-{ // lead 2
-    .ctrl  = 0x80,
+// saws
+{
+    .ctrl  = 0x20,
     .pw_lo = 0x00,
     .pw_hi = 0x00,
     .ad    = 0x38,
-    .sr    = 0x84
+    .sr    = 0xA9
 },
+
+{
+    .ctrl  = 0x20,
+    .pw_lo = 0x00,
+    .pw_hi = 0x00,
+    .ad    = 0x38,
+    .sr    = 0xC6
+},
+
+{
+    .ctrl  = 0x20,
+    .pw_lo = 0x00,
+    .pw_hi = 0x00,
+    .ad    = 0x38,
+    .sr    = 0xFA
+},
+
+{
+    .ctrl  = 0x20,
+    .pw_lo = 0x00,
+    .pw_hi = 0x04,
+    .ad    = 0x38,
+    .sr    = 0xFA
+},
+
+// noise
+{
+    .ctrl  = 0x80,
+    .pw_lo = 0x10,
+    .pw_hi = 0x00,
+    .ad    = 0x22,
+    .sr    = 0x86
+},
+
+{
+    .ctrl  = 0x80,
+    .pw_lo = 0x10,
+    .pw_hi = 0x00,
+    .ad    = 0x27,
+    .sr    = 0xAA
+},
+
+{
+    .ctrl  = 0x80,
+    .pw_lo = 0x10,
+    .pw_hi = 0x00,
+    .ad    = 0xA5,
+    .sr    = 0x89
+},
+
+{
+    .ctrl  = 0x80,
+    .pw_lo = 0x10,
+    .pw_hi = 0x00,
+    .ad    = 0xA5,
+    .sr    = 0x99
+},
+{
+    .ctrl  = 0x10,
+    .pw_lo = 0x60,
+    .pw_hi = 0x00,
+    .ad    = 0x38,
+    .sr    = 0xA9
+},
+
+{
+    .ctrl  = 0x10,
+    .pw_lo = 0x80,
+    .pw_hi = 0x00,
+    .ad    = 0x38,
+    .sr    = 0xC6
+},
+
+{
+    .ctrl  = 0x10,
+    .pw_lo = 0x10,
+    .pw_hi = 0x00,
+    .ad    = 0x38,
+    .sr    = 0xFA
+},
+
+{
+    .ctrl  = 0x10,
+    .pw_lo = 0x00,
+    .pw_hi = 0x04,
+    .ad    = 0x38,
+    .sr    = 0xFA
+},
+// sine
 };
 
 Sid6581 *sid;
@@ -142,37 +213,40 @@ void setup()
     Serial.begin(9600);
     
     // no waiting unless we need to, the clocks are weird. -_-
-    /*
-    while (!Serial.available())
-        continue;
-    */
+    // uncomment if you need it
+    //while (Serial.available())
+        //continue;
+
+    Serial.println("On");
 
     // set up the clock
     clk_setup();
 
     // set up midi
     midi = new Midi();
+    midi->open();
     
     // make the sid
     sid = new Sid6581();
-
-    // channels
-    channels[0] = new Channel(sid, &voice_one_reg, channel_one_voices);
-    channels[1] = new Channel(sid, &voice_two_reg, channel_two_voices);
-    channels[2] = new Channel(sid, &voice_three_reg, channel_three_voices);
-
-    // move this to reset plz
-    for (uint8_t i = 0; i < 0x19; i++)
-    {
-        sid->poke(i, 0x00);
-    }
     sid->reset();
-
     sid->set_master_volume(0x0f);
+
+    // cheeky filter
+    sid->poke(0x16, 0x92);
+    sid->poke(0x17, 0xF3);
+    sid->poke(0x18, 0x5F);
+
+    // set up channels
+    channels[0] = new Channel(sid, &voice_one_reg, channel_one_voices);
+    channels[1] = new Channel(sid, &voice_two_reg, channel_one_voices);
+    channels[2] = new Channel(sid, &voice_three_reg, channel_one_voices);
+    Serial.println("End of setup");
 }
 
 void loop()
 {
     MidiMessage message = midi->get_next_message();
-    channels[message.channel]->handle_message(message);
+
+    if (message.channel < 3)
+        channels[message.channel]->handle_message(message);
 }

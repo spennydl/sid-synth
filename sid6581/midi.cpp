@@ -14,7 +14,9 @@ void Midi::open() const
 MidiMessage Midi::get_next_message() const
 {
     while (!Serial1.available())
-        ; // block for next message
+        ; // block for a message
+    
+    Serial.println("Message is here");
 
     uint8_t status = Serial1.read();
 
